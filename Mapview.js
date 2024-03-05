@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
-import { View, Button, StyleSheet } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import { View, Text, StyleSheet, TouchableOpacity, Clipboard } from 'react-native'; // Importez le composant Text
+import MapView, { Marker, Callout } from 'react-native-maps';
 
-const MainScreen = ({ navigation }) => {
+const Mapview = () => {
   const [markerPosition, setMarkerPosition] = useState(null);
-
-  const handleLogin = () => {
-    navigation.navigate('LoginForm');
-  };
 
   const handleMapPress = (event) => {
     const { coordinate } = event.nativeEvent;
-    print("coordinate" + coordinate)
-    setMarkerPosition(coordinate); // Remplacer le marqueur existant par le nouveau
+    setMarkerPosition(coordinate);
+  };
+
+  const copyToClipboard = () => {
+    if (markerPosition) {
+      const coordinateString = `${markerPosition.latitude.toFixed(6)} ${markerPosition.longitude.toFixed(6)}`;
+      Clipboard.setString(coordinateString);
+    }
   };
 
   return (
@@ -24,14 +26,19 @@ const MainScreen = ({ navigation }) => {
         onPress={handleMapPress}
       >
         {markerPosition && (
-          <Marker  pinColor="green"
-          coordinate={markerPosition} />
+          <Marker
+            coordinate={markerPosition}
+            draggable // Permet de déplacer le marqueur sur la carte
+            onDragEnd={(e) => setMarkerPosition(e.nativeEvent.coordinate)} // Mise à jour de la position du marqueur lorsqu'il est déplacé
+          >
+            <Callout>
+              <TouchableOpacity onPress={copyToClipboard}>
+                <Text style={styles.coordinateText}>{`${markerPosition.latitude.toFixed(6)} ${markerPosition.longitude.toFixed(6)}`}</Text>
+              </TouchableOpacity>
+            </Callout>
+          </Marker>
         )}
       </MapView>
-      <Button
-        title="Accéder au formulaire de connexion"
-        onPress={handleLogin}
-      />
     </View>
   );
 };
@@ -39,10 +46,15 @@ const MainScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   map: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
+  },
+  coordinateText: {
+    fontSize: 16,
   },
 });
 
-export default MainScreen;
+export default Mapview;

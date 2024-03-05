@@ -5,6 +5,7 @@ const LoginForm = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showSignupForm, setShowSignupForm] = useState(false); // Ajout de l'état pour contrôler la visibilité du formulaire d'inscription
+  const [showForgotPasswordForm, setShowForgotPasswordForm] = useState(false); // Ajout de l'état pour contrôler la visibilité du formulaire de réinitialisation du mot de passe
 
   const handleLogin = () => {
     // Ajouter ici la logique de connexion
@@ -19,9 +20,13 @@ const LoginForm = () => {
     setShowSignupForm(true); // Afficher le formulaire d'inscription lorsque l'utilisateur clique sur "Créer un compte"
   };
 
+  const handleForgotPassword = () => {
+    setShowForgotPasswordForm(true); // Afficher le formulaire de réinitialisation du mot de passe lorsque l'utilisateur clique sur "Mot de passe oublié"
+  };
+
   return (
     <View style={styles.container}>
-      {!showSignupForm ? (
+      {!showSignupForm && !showForgotPasswordForm ? (
         <View>
           <Image
             source={require('./assets/adam.jpg')}
@@ -43,19 +48,20 @@ const LoginForm = () => {
             secureTextEntry={true}
           />
           
-          <TouchableOpacity onPress={() => console.log("Mot de passe oublié")}>
+          <TouchableOpacity onPress={handleForgotPassword}>
             <Text style={styles.link}>Mot de passe oublié</Text>
           </TouchableOpacity>
           <Button
             title="Se connecter"
             onPress={handleLogin}
           />
-                    <Button onPress={handleSignup}
-            title="Se Créer un compte"
+          <Button onPress={handleSignup}
+            title="Créer un compte"
           />
           
         </View>
-      ) : (
+      ) : showSignupForm ? (
+        // Formulaire d'inscription
         <View>
           <Image
             source={require('./assets/adam.jpg')}
@@ -89,6 +95,29 @@ const LoginForm = () => {
             }}
           />
           <TouchableOpacity onPress={() => setShowSignupForm(false)}>
+            <Text style={styles.link}>Annuler</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        // Formulaire de réinitialisation du mot de passe
+        <View>
+            <Image
+            source={require('./assets/adam.jpg')}
+            style={styles.image}
+          />
+          <Text style={styles.label}>Réinitialiser le mot de passe:</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Entrez votre adresse email"
+          />
+          <Button
+            title="Envoyer"
+            onPress={() => {
+              // Ajouter ici la logique pour envoyer un email de réinitialisation du mot de passe
+              setShowForgotPasswordForm(false); // Masquer le formulaire de réinitialisation du mot de passe après l'envoi réussi
+            }}
+          />
+          <TouchableOpacity onPress={() => setShowForgotPasswordForm(false)}>
             <Text style={styles.link}>Annuler</Text>
           </TouchableOpacity>
         </View>
