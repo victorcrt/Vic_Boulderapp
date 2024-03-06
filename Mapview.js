@@ -1,9 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Clipboard } from 'react-native'; // Importez le composant Text
 import MapView, { Marker, Callout } from 'react-native-maps';
+import * as Location from 'expo-location';
 
 const Mapview = () => {
   const [markerPosition, setMarkerPosition] = useState(null);
+  const [location, setLocation] = useState(null);
+
+  useEffect(() => {
+    getLocation();
+  }, []);
+
+  const getLocation = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      console.error('Permission to access location was denied');
+      return;
+    }
+
+    let currentLocation = await Location.getCurrentPositionAsync({});
+    const { latitude, longitude } = currentLocation.coords;
+    setMarkerPosition({ latitude, longitude });
+    setLocation({ latitude, longitude });
+  };
 
   const handleMapPress = (event) => {
     const { coordinate } = event.nativeEvent;
@@ -24,6 +43,12 @@ const Mapview = () => {
         zoomEnabled={true}
         scrollEnabled={true}
         onPress={handleMapPress}
+        initialRegion={{
+          latitude: location ? location.latitude : 0,
+          longitude: location ? location.longitude : 0,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        }}
       >
         {markerPosition && (
           <Marker
