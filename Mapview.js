@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Clipboard } from 'react-native'; // Importez le composant Text
+import { View, Text, StyleSheet, TouchableOpacity, Clipboard } from 'react-native';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import * as Location from 'expo-location';
 
 const Mapview = () => {
   const [markerPosition, setMarkerPosition] = useState(null);
   const [location, setLocation] = useState(null);
+  const [showBlocForm, setShowBlocForm] = useState(false);
 
   useEffect(() => {
     getLocation();
@@ -27,6 +28,12 @@ const Mapview = () => {
   const handleMapPress = (event) => {
     const { coordinate } = event.nativeEvent;
     setMarkerPosition(coordinate);
+  };
+
+  const handleCoordinatePress = () => {
+    if (markerPosition) {
+      setShowBlocForm(true);
+    }
   };
 
   const copyToClipboard = () => {
@@ -53,8 +60,8 @@ const Mapview = () => {
         {markerPosition && (
           <Marker
             coordinate={markerPosition}
-            draggable // Permet de déplacer le marqueur sur la carte
-            onDragEnd={(e) => setMarkerPosition(e.nativeEvent.coordinate)} // Mise à jour de la position du marqueur lorsqu'il est déplacé
+            draggable
+            onDragEnd={(e) => setMarkerPosition(e.nativeEvent.coordinate)}
           >
             <Callout>
               <TouchableOpacity onPress={copyToClipboard}>
@@ -64,6 +71,9 @@ const Mapview = () => {
           </Marker>
         )}
       </MapView>
+      {showBlocForm && (
+        <Blocform coordinates={markerPosition} onClose={() => setShowBlocForm(false)} />
+      )}
     </View>
   );
 };
